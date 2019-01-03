@@ -41,7 +41,7 @@ void StartScreen::run(ALLEGRO_FONT * font) {
 				cont();
 				exit_screen = true;
 				break;
-			case ALLEGRO_KEY_BACKSPACE:
+			case ALLEGRO_KEY_ESCAPE:
 				back();
 				exit_screen = true;
 				break;

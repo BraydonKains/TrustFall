@@ -28,6 +28,9 @@
     <Filter Include="Source Files\ScreensImplement">
       <UniqueIdentifier>{bc95f981-5965-4a34-8f2e-afba2627bb4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\TrustFallImplement">
+      <UniqueIdentifier>{b26b82a2-f4cd-444a-923f-82aad7c96345}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -48,6 +51,9 @@
     <ClCompile Include="game_screen.cpp">
       <Filter>Source Files\ScreensImplement</Filter>
     </ClCompile>
+    <ClCompile Include="line.cpp">
+      <Filter>Source Files\TrustFallImplement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cursor.h">
@@ -67,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="game_screen.h">
       <Filter>Header Files\Screens</Filter>
+    </ClInclude>
+    <ClInclude Include="line.h">
+      <Filter>Header Files\TrustFall</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

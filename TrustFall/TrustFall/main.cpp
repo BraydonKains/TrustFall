@@ -1,11 +1,4 @@
 #include <stdio.h>
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_audio.h>
-#include <allegro5/allegro_acodec.h>
-
 #include <string>
 
 #include "game.h"
@@ -40,11 +33,7 @@ int main()
 		return -1;
 	}
 	if (!al_install_keyboard()) {
-		fprintf(stderr, "failed to initialize allegro!\n");
-		return -1;
-	}
-	if (!al_reserve_samples(1)) {
-		fprintf(stderr, "failed to reserve samples!\n");
+		fprintf(stderr, "failed to initialize keyboard!\n");
 		return -1;
 	}
 
@@ -56,6 +45,6 @@ int main()
 	main_game.run();
 
 	al_destroy_display(display);
-
+	
 	return 0;
 }

@@ -21,16 +21,13 @@ Line::Line(int _start_x, int _start_y, map<string, ALLEGRO_BITMAP*> _sprites) {
 }
 
 void Line::move() {
-	if (caught) {
-		caught = false;
-		catchers[0] = catchers[1];
-		catchers[1] = catchers[0];
-		catchers[2] = 0;
-	}
-
 	if (employees[0]) {
 		if (catchers[0]) {
+
 			caught = true;
+			catchers[0] = catchers[1];
+			catchers[1] = catchers[0];
+			catchers[2] = 0;
 		}
 		else {
 			fall = true;
@@ -65,24 +62,24 @@ void Line::draw() {
 		}
 	}
 
-	for (int i = 2; i > -1; i++) {
+	for (int i = 2; i > -1; i--) {
 		if (i = 0) {
 			if (caught) {
 				al_draw_bitmap(sprites["EmployeeHappy"], start_x - 40, start_y, NULL);
-				al_draw_bitmap(sprites["MrMan"], start_x - 40, start_y - 40, NULL);
+				caught = false;
 			}
 			else if (fall) {
 					al_draw_bitmap(sprites["EmployeeSad"], start_x - 40, start_y - 55, ALLEGRO_FLIP_VERTICAL);
 			}
 			else {
 				if (catchers[i]) {
-					al_draw_bitmap(sprites["MrMan"], start_x - 40, start_y - 40, NULL);
+					al_draw_bitmap(sprites["Mr. Man"], start_x - 40, start_y - 40, NULL);
 				}
 			}
 		}
 		else {
 			if (catchers[i]) {
-				al_draw_bitmap(sprites["MrMan"], start_x - 40 - (50*(i+1)), start_y - 40, NULL);
+				al_draw_bitmap(sprites["Mr. Man"], start_x - 40 - (50*(i)), start_y + 40, NULL);
 			}
 		}
 	}

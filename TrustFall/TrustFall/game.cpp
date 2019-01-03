@@ -32,8 +32,9 @@ void Game::reset() {
 
 void Game::run() {
 	StartScreen start_screen(sprites);
-	GameScreen game_screen(sprites);
+	GameScreen game_screen(sprites, 3);
 	while (state != Exit) {
+		al_clear_to_color(al_map_rgb(0, 0, 0));
 		switch (state) {
 		case Start:
 			start_screen.run(font);

@@ -1,7 +1,6 @@
 #pragma once
 #include "line.h"
 #include "screen.h"
-#include "cursor.h"
 
 class GameScreen : public Screen {
 public:
