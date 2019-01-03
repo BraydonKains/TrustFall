@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="cursor.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="game_screen.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="start_screen.cpp" />
   </ItemGroup>
@@ -138,6 +139,7 @@
     <ClInclude Include="cursor.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="game_screen.h" />
     <ClInclude Include="screen.h" />
     <ClInclude Include="start_screen.h" />
   </ItemGroup>

@@ -45,6 +45,9 @@
     <ClCompile Include="start_screen.cpp">
       <Filter>Source Files\ScreensImplement</Filter>
     </ClCompile>
+    <ClCompile Include="game_screen.cpp">
+      <Filter>Source Files\ScreensImplement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cursor.h">
@@ -60,6 +63,9 @@
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="start_screen.h">
+      <Filter>Header Files\Screens</Filter>
+    </ClInclude>
+    <ClInclude Include="game_screen.h">
       <Filter>Header Files\Screens</Filter>
     </ClInclude>
   </ItemGroup>

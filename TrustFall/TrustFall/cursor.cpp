@@ -4,6 +4,7 @@
 #include <string>
 
 #include "cursor.h"
+#include "line.h"
 
 using std::string;
 using std::vector;

@@ -6,8 +6,14 @@
 using std::vector;
 using std::string;
 
-GameScreen::GameScreen(std::map<std::string, ALLEGRO_BITMAP*> _sprites) {
+GameScreen::GameScreen(std::map<std::string, ALLEGRO_BITMAP*> _sprites, int _lines) {
 	sprites = _sprites;
+
+	for (int i = 0; i < _lines; i++) {
+		Line new_line(SCREEN_W-220, SCREEN_H/_lines * i, sprites);
+	}
+
+	selected = 0;
 }
 
 void GameScreen::run(ALLEGRO_FONT * font) {

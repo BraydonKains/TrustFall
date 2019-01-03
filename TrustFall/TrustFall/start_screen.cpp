@@ -54,9 +54,9 @@ void StartScreen::run(ALLEGRO_FONT * font) {
 
 void StartScreen::redraw(ALLEGRO_FONT* font) {
 	al_draw_bitmap(sprites["Title"], 0, 20, NULL);
-	al_draw_bitmap(sprites["Mr. Manager"], SCREEN_W / 2 - 24, 150, NULL);
+	al_draw_bitmap(sprites["Mr. Manager"], SCREEN_W / 2 - 40, 120, NULL);
 	for (int i = 1; i < 7; i++) {
-		al_draw_bitmap(sprites["Mr. Man"], SCREEN_W / 8 * i + 14, SCREEN_H / 2 - 40, NULL);
+		al_draw_bitmap(sprites["Mr. Man"], SCREEN_W / 8 * i + 14, SCREEN_H / 2 - 30, NULL);
 	}
 
 	al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2, SCREEN_H / 2 + 20, ALLEGRO_ALIGN_CENTER, "Mr. Manager wants to run a teambuilding exercise for his employees.");
