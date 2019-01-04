@@ -15,7 +15,7 @@ public:
 	std::map<std::string, ALLEGRO_BITMAP*> sprites;
 
 	int catchers[3];
-	int employees[5];
+	int employees[6];
 
 	bool queued;
 	bool fall;

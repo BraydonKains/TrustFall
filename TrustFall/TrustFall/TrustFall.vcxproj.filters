@@ -54,6 +54,15 @@
     <ClCompile Include="line.cpp">
       <Filter>Source Files\TrustFallImplement</Filter>
     </ClCompile>
+    <ClCompile Include="catcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="employee.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="result_screen.cpp">
+      <Filter>Source Files\ScreensImplement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cursor.h">
@@ -76,6 +85,15 @@
     </ClInclude>
     <ClInclude Include="line.h">
       <Filter>Header Files\TrustFall</Filter>
+    </ClInclude>
+    <ClInclude Include="catcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="employee.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="result_screen.h">
+      <Filter>Header Files\Screens</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -87,6 +87,16 @@
     <Allegro_AddonFont>true</Allegro_AddonFont>
     <Allegro_AddonColor>true</Allegro_AddonColor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Allegro_AddonImage>true</Allegro_AddonImage>
+    <Allegro_AddonTTF>true</Allegro_AddonTTF>
+    <Allegro_AddonPrimitives>true</Allegro_AddonPrimitives>
+    <Allegro_AddonAudio>true</Allegro_AddonAudio>
+    <Allegro_AddonAcodec>true</Allegro_AddonAcodec>
+    <Allegro_AddonMemfile>true</Allegro_AddonMemfile>
+    <Allegro_AddonFont>true</Allegro_AddonFont>
+    <Allegro_AddonColor>true</Allegro_AddonColor>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -138,19 +148,25 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="catcher.cpp" />
     <ClCompile Include="cursor.cpp" />
+    <ClCompile Include="employee.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="game_screen.cpp" />
     <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="result_screen.cpp" />
     <ClCompile Include="start_screen.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="catcher.h" />
     <ClInclude Include="cursor.h" />
+    <ClInclude Include="employee.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="game_screen.h" />
     <ClInclude Include="line.h" />
+    <ClInclude Include="result_screen.h" />
     <ClInclude Include="screen.h" />
     <ClInclude Include="start_screen.h" />
   </ItemGroup>
