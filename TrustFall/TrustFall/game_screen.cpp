@@ -1,9 +1,12 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include <vector>
 #include <string>
 #include <sstream>
 #include <map>
+#include <ctime>
 
 #include "game_screen.h"
 
@@ -15,14 +18,15 @@ using std::ostringstream;
 using std::map;
 using std::pair;
 
-GameScreen::GameScreen(std::map<std::string, ALLEGRO_BITMAP*> _sprites) {
+GameScreen::GameScreen(std::map<std::string, ALLEGRO_BITMAP*> _sprites, std::map<std::string, ALLEGRO_SAMPLE*> _samples) {
 	sprites = _sprites;
+	samples = _samples;
+	srand(time(NULL)); //Seed random number generator with current time so sequence is unique each run
 }
 
+//Resets game to default values, and uses new given values
 void GameScreen::reset(int _lines, int _max_catchers, int _difficulty) {
-	if (!lines.empty()) {
-		lines.erase(lines.begin(), lines.begin() + _lines);
-	}
+	lines.clear();
 	for (int i = 0; i < _lines; i++) {
 		Line new_line(SCREEN_W / 2, SCREEN_H / _lines * i, sprites);
 		lines.push_back(new_line);
@@ -33,88 +37,139 @@ void GameScreen::reset(int _lines, int _max_catchers, int _difficulty) {
 	catchers = 0;
 	score = 0;
 	difficulty = _difficulty;
+	music = true;
+}
+
+//If a sample needs to be played while it is still being played, it will be stopped first.
+//Admittedly this was a hack solution to the fact that my sound effect samples are too long. 
+//In future projects I will use a better program for sound effect creation that does not have a large minimum length for audio export.
+void play(ALLEGRO_SAMPLE_INSTANCE* x) {
+	if (al_get_sample_instance_playing(x)) {
+		al_stop_sample_instance(x);
+	}
+	al_play_sample_instance(x);
 }
 
 void GameScreen::run(ALLEGRO_FONT* font) {
-	bool music = true;
-	bool help = false;
-
+	//Map that represents difficulty scale
 	map<int, double> difficulty_map;
 	difficulty_map.insert(pair<int, int>(1, 15));
 	difficulty_map.insert(pair<int, int>(2, 12));
 	difficulty_map.insert(pair<int, int>(3, 10));
 	difficulty_map.insert(pair<int, int>(4, 8));
 	difficulty_map.insert(pair<int, int>(5, 5));
-	
+	difficulty_map.insert(pair<int, int>(6, 3));
+	difficulty_map.insert(pair<int, int>(7, 2));
+
 	ALLEGRO_EVENT_QUEUE* event_queue = NULL;
 	event_queue = al_create_event_queue();
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	
 	ALLEGRO_TIMER* timer = NULL;
-	timer = al_create_timer(0.1);
+	timer = al_create_timer(0.1); //Universally a "tick" in the context of the game is 1/10 of a second.
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	
 	redraw(font);
 	al_flip_display();
 
-	int ticks = 0;
+	//Create map of sample instances. This is more memory efficient than play samples over and over again individually, 
+	//and allows the anti-overlap functionality implemented above.
+	map<string, ALLEGRO_SAMPLE_INSTANCE*> instances;
+	map<string, ALLEGRO_SAMPLE*>::iterator it;
+	for (it = samples.begin(); it != samples.end(); it++) {
+		instances.insert(pair<string, ALLEGRO_SAMPLE_INSTANCE*>(it->first, al_create_sample_instance(it->second)));
+		al_attach_sample_instance_to_mixer(instances[it->first], al_get_default_mixer());
+	}
+
+	al_set_sample_instance_playmode(instances["Theme"], ALLEGRO_PLAYMODE_LOOP);
+	play(instances["Theme"]);
+
+	int ticks = 0; //Counts the number of ticks, this is used to determine when to move the lines
 	bool exit_screen = false;
-	bool ctrl = false;
+	bool ctrl = false; //whether ctrl key is currently held
+	bool help = false; //whether help screen is currently displayed
+
 	al_start_timer(timer);
 	while (!exit_screen) {
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue, &ev);
 		if (ev.type == ALLEGRO_EVENT_TIMER) {
-			if (ticks == difficulty_map[difficulty]) {
-				int add_to = rand() % (lines.size() + 1);
+			if (ticks == difficulty_map[difficulty]) { //If at the current difficulty level, the lines are due to move
+				int add_to = rand() % (lines.size() + 1); //Randomly decide which line to add to, with a 1/lines.size() chance of not adding
 				for (unsigned int i = 0; i < lines.size(); i++) {
 					if (i == add_to) {
 						lines.at(i).add_employee();
 					}
-					lines.at(i).move();
-					if (lines.at(i).fall) {
+					lines.at(i).move(); //Every line will move regardless of any factors
+					if (lines.at(i).fall) { //If an employee has fallen, the game is over
+						map<string, ALLEGRO_SAMPLE_INSTANCE*>::iterator in_it;
+						for (in_it = instances.begin(); in_it != instances.end(); in_it++) {
+							al_stop_sample_instance(in_it->second);
+						}
+						al_play_sample_instance(instances["Fall"]);
 						exit_screen = true;
+						al_clear_to_color(al_map_rgb(0, 0, 0));
+						redraw(font);
+						al_flip_display();
+						al_rest(2.0);
 					}
-					else if (lines.at(i).caught) {
+					else if (lines.at(i).caught) { //If an employee is caught, add to the score and then check if difficulty should be adjusted
+						play(instances["Catch"]);
 						catchers--;
 						score++;
-						if ((score == 10 || score == 20 || score == 30 || score == 40 || score == 50) && difficulty < 5) {
+						if ((score == 10 || score == 20 || score == 30 || score == 40 || score == 50 || score == 75 || score == 100) && difficulty < 7) {
+							play(instances["LevelUp"]);
 							difficulty++;
 						}
 					}
 				}
+				//Refresh screen
 				al_clear_to_color(al_map_rgb(0, 0, 0));
 				redraw(font);
 				al_flip_display();
-				ticks = 0;
+				ticks = 0; //reset ticks
 			}
 			else {
+				//if not time to move, add to ticks
 				ticks++;
 			}
 		}
 	    if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
 			switch (ev.keyboard.keycode) {
 			case ALLEGRO_KEY_DOWN:
-				if (selected < 2) selected++;
+				play(instances["Move"]);
+				if (selected < lines.size() - 1) selected++;
 				break;
 			case ALLEGRO_KEY_UP:
+				play(instances["Move"]);
 				if (selected > 0) selected--;
 				break;
 			case ALLEGRO_KEY_SPACE:
 				if (catchers < max_catchers) {
-					lines.at(selected).add_catcher();
-					catchers++;
+					if (!lines.at(selected).catchers[2]) {
+						play(instances["Place"]);
+						lines.at(selected).add_catcher();
+						catchers++;
+					}
 				}
 				break;
 			case ALLEGRO_KEY_M:
-				if (ev.keyboard.modifiers == ALLEGRO_KEYMOD_CTRL) {
+				//Toggle music
+				if (ctrl) {
+					if (music) {
+						al_stop_sample_instance(instances["Theme"]);
+					}
+					else {
+						al_play_sample_instance(instances["Theme"]);
+					}
 					music = !music;
 				}
 				break;
 			case ALLEGRO_KEY_H:
 				if (ctrl) {
-					help = true;
+					help = true; //help screen is up
 
+					//Draw the help screen
 					al_clear_to_color(al_map_rgb(0, 0, 0));
 					al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2, SCREEN_H / 2 + 20, ALLEGRO_ALIGN_CENTER, "Place catchers at the ends of the conveyors");
 					al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2, SCREEN_H / 2 + 30, ALLEGRO_ALIGN_CENTER, "You can place 3 catchers per conveyor");
@@ -125,7 +180,9 @@ void GameScreen::run(ALLEGRO_FONT* font) {
 					al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 8 + 68, SCREEN_H / 1.5 - 10, ALLEGRO_ALIGN_LEFT, "Up and down - Move cursor");
 
 					al_draw_bitmap(sprites["Spacebar"], SCREEN_W / 8 + 20, SCREEN_H / 2 + 100, NULL);
-					al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 8 + 68, SCREEN_H / 1.3 - 20, ALLEGRO_ALIGN_LEFT, "Spacebar - Place employee");
+					al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 8 + 68, SCREEN_H / 1.3 - 20, ALLEGRO_ALIGN_LEFT, "Spacebar - ");
+					al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 8 + 150, SCREEN_H / 1.3 - 15, ALLEGRO_ALIGN_LEFT, "Place Employee");
+					al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 8 + 150, SCREEN_H / 1.3 - 25, ALLEGRO_ALIGN_LEFT, "Select Menu Item");
 										
 					al_draw_bitmap(sprites["KeyEsc"], SCREEN_W / 2 + 58, SCREEN_H / 2 + 60, NULL);
 					al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2 + 113, SCREEN_H / 1.5 - 10, ALLEGRO_ALIGN_LEFT, "Close menu");
@@ -137,50 +194,61 @@ void GameScreen::run(ALLEGRO_FONT* font) {
 
 					al_flip_display();
 
-					while (help) {
+					while (help) { //While the help screen is still down
 						ALLEGRO_EVENT unhelp;
 						al_wait_for_event(event_queue, &unhelp);
 
 						if (unhelp.type == ALLEGRO_EVENT_KEY_DOWN) {
 							if (unhelp.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
-								help = false;
+								help = false; //Take the help screen down
 							}
 						}
 					}
 				}
 				break;
 			case ALLEGRO_KEY_ESCAPE:
-				back();
+				//Force quit game
+				back(); 
 				exit_screen = true;
 				break;
 			case ALLEGRO_KEY_LCTRL:
 			case ALLEGRO_KEY_RCTRL:
-				ctrl = true;
+				ctrl = true; //ctrl is held
 				break;
 			}
 			if (ev.type == ALLEGRO_EVENT_KEY_UP) {
 				if (ev.keyboard.keycode == ALLEGRO_KEY_LCTRL || ev.keyboard.keycode == ALLEGRO_KEY_RCTRL) {
-					ctrl = false;
+					ctrl = false; //ctrl is released
 				}
 			}
+			//Global refresh
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 			redraw(font);
 			al_flip_display();
 		}
 	}
-	if (next_state != Exit) {
+	if (next_state != Exit) { //If the game loop was exited naturally rather than forced by Esc
 		cont();
 	}
-	al_rest(2.0);
+	
+	//Garbage collection
+	al_destroy_event_queue(event_queue);
+	al_destroy_timer(timer);
+	map<string, ALLEGRO_SAMPLE_INSTANCE*>::iterator it2;
+	for (it2 = instances.begin(); it2 != instances.end(); it2++) {
+		al_destroy_sample_instance(it2->second);
+	}
 }
 
+//Redraw all elements of the screen
 void GameScreen::redraw(ALLEGRO_FONT* font) {
-	al_draw_bitmap(sprites["Mr. Manager"], 80, 0 + (SCREEN_H / lines.size() * selected), NULL);
+	al_draw_bitmap(sprites["Mr. Manager"], 80, 0 + (SCREEN_H / lines.size() * selected), NULL); //Draw the manager based on which line is selected
 
-	for (unsigned int i = 0; i < lines.size(); i++) {
+	for (unsigned int i = 0; i < lines.size(); i++) { //Draw each line
 		lines.at(i).draw();
 	}
 
+	//Display score, number of catchers, current difficulty level, and whether the music is on or off
 	ostringstream score_msg;
 	score_msg << "Score:  " << score;
 	al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W - 90, 0, ALLEGRO_ALIGN_LEFT, score_msg.str().c_str());
@@ -193,6 +261,9 @@ void GameScreen::redraw(ALLEGRO_FONT* font) {
 	ostringstream difficulty_msg;
 	difficulty_msg << "Level:  " << difficulty;
 	al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W - 90, 75, ALLEGRO_ALIGN_LEFT, difficulty_msg.str().c_str());
+
+	string music_img = (music) ? "MusicOn" : "MusicOff";
+	al_draw_bitmap(sprites[music_img], SCREEN_W - 60, 90, NULL);
 }
 
 void GameScreen::back() {

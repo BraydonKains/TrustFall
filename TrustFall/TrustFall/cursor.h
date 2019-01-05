@@ -3,11 +3,12 @@
 #include <allegro5/allegro_font.h>
 #include <vector>
 
+//Default object used for menues
 template <class T>
 class Cursor {
 public:
 	std::vector<T> items;
-	int selected;
+	unsigned int selected;
 	bool active;
 
 	Cursor();

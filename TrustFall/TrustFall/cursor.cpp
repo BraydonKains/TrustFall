@@ -15,6 +15,7 @@ Cursor<T>::Cursor()
 	active = false;
 }
 
+//Give items to the cursor, and set the selected item to be the first
 template<class T>
 void Cursor<T>::activate(std::vector<T> _items)
 {
@@ -23,12 +24,14 @@ void Cursor<T>::activate(std::vector<T> _items)
 	active = true;
 }
 
+//Functionality that was not used for this game, may be used in future projects.
 template<class T>
 void Cursor<T>::deactivate()
 {
 	active = false;
 }
 
+//Draw the menu options on the screen based on the x and y coordinates for the menu to start at
 template<class T>
 void Cursor<T>::draw(float _x_start, float _y_start, float _y_offset, ALLEGRO_FONT* _font) {
 	vector<string> items_text = get_item_strings();
@@ -38,13 +41,14 @@ void Cursor<T>::draw(float _x_start, float _y_start, float _y_offset, ALLEGRO_FO
 	y_offset = _y_offset;
 	font = _font;
 
-	for (int i = 0; i < items_text.size(); i++) {
+	for (unsigned int i = 0; i < items_text.size(); i++) {
 		al_draw_text(font, al_map_rgb(255, 255, 255), x_start, y_start + (y_offset*i), ALLEGRO_ALIGN_LEFT, items_text.at(i).c_str());
 	}
 
 	update_selector();
 }
 
+//Change the selection of the cursor
 template<class T>
 void Cursor<T>::down()
 {
@@ -68,6 +72,7 @@ T Cursor<T>::get_selected() {
 	return items.at(selected);
 }
 
+//Clear screen before drawing menu
 template<class T>
 void Cursor<T>::redraw()
 {
@@ -75,6 +80,7 @@ void Cursor<T>::redraw()
 	draw(x_start, y_start, y_offset, font);
 }
 
+//Draw selector to highlight proper selected item
 template<class T>
 void Cursor<T>::update_selector() {
 	ALLEGRO_COLOR white = al_map_rgb(255, 255, 255);
@@ -89,6 +95,7 @@ void Cursor<T>::update_selector() {
 	al_draw_filled_triangle(x1, y1, x2, y2, x3, y3, white);
 }
 
+//Define how the template will function when given various types. Only string was needed for this project.
 template Cursor<string>::Cursor();
 template void Cursor<string>::activate(std::vector<string> _options);
 template void Cursor<string>::deactivate();

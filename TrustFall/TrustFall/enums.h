@@ -3,9 +3,13 @@
 #define SCREEN_W 640
 #define SCREEN_H 480
 
+//Collection of states run by state machine
 enum State {
 	Start,
-	Gameplay,
+	Easy,
+	Medium,
+	Hard,
+	EXTREME,
 	Help,
 	End,
 	Exit

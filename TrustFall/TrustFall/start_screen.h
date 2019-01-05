@@ -2,6 +2,7 @@
 #include "screen.h"
 #include "cursor.h"
 
+//Starting menu
 class StartScreen : public Screen {
 public:
 	Cursor<std::string> menu;

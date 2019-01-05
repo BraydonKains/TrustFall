@@ -37,13 +37,18 @@ int main()
 		return -1;
 	}
 
+	//Create display
 	ALLEGRO_DISPLAY* display = al_create_display(SCREEN_W, SCREEN_H);
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 
+	//Create game, initialize and run it
 	Game main_game;
 	main_game.init();
 	main_game.run();
 
+	//Garbage collection
+	al_uninstall_audio();
+	al_uninstall_keyboard();
 	al_destroy_display(display);
 	
 	return 0;

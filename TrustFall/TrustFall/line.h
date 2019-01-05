@@ -4,9 +4,7 @@
 #include <map>
 #include <string>
 
-#include "catcher.h"
-#include "employee.h"
-
+//Represents a conveyor belt line, contains data for the employees and catchers attached as well as some data about its current state
 class Line {
 public:
 	float start_x;

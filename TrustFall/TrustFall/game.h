@@ -12,6 +12,7 @@
 
 #include "enums.h"
 
+//Game state machine, contains data global to game
 class Game {
 public:
 	//Allegro elements
@@ -23,6 +24,7 @@ public:
 	int score;
 	
 	std::map<std::string, ALLEGRO_BITMAP*> sprites;
+	std::map<std::string, ALLEGRO_SAMPLE*> samples;
 
 	Game();
 

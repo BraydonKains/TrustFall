@@ -148,9 +148,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="catcher.cpp" />
     <ClCompile Include="cursor.cpp" />
-    <ClCompile Include="employee.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="game_screen.cpp" />
     <ClCompile Include="line.cpp" />
@@ -159,9 +157,7 @@
     <ClCompile Include="start_screen.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="catcher.h" />
     <ClInclude Include="cursor.h" />
-    <ClInclude Include="employee.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="game_screen.h" />

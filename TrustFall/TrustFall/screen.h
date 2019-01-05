@@ -7,6 +7,7 @@
 
 #include "enums.h"
 
+//Screen base class, implemented by every game screen
 class Screen {
 public:
 	State next_state;
