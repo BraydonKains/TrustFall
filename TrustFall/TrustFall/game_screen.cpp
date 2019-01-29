@@ -38,6 +38,7 @@ void GameScreen::reset(int _lines, int _max_catchers, int _difficulty) {
 	score = 0;
 	difficulty = _difficulty;
 	music = true;
+	int x = 0;
 }
 
 //If a sample needs to be played while it is still being played, it will be stopped first.
