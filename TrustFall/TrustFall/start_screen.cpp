@@ -28,6 +28,7 @@ void StartScreen::run(ALLEGRO_FONT * font) {
 	al_flip_display();
 	
 	bool ctrl = false;
+	bool shift = false;
 	bool exit_screen = false;
 	while (!exit_screen) {
 		ALLEGRO_EVENT ev;
@@ -47,6 +48,9 @@ void StartScreen::run(ALLEGRO_FONT * font) {
 				if (ctrl) { //If the ctrl key is held regardless of option, they will enter EXTREME easter egg mode
 					next_state = EXTREME;
 				}
+				else if (shift) {
+					next_state = Chaos;
+				}
 				else {
 					cont(); //Otherwise select the menu item
 				}
@@ -62,6 +66,10 @@ void StartScreen::run(ALLEGRO_FONT * font) {
 			case ALLEGRO_KEY_RCTRL:
 				ctrl = true; //ctrl is held down
 				break;
+			case ALLEGRO_KEY_LSHIFT:
+			case ALLEGRO_KEY_RSHIFT:
+				shift = true;
+				break;
 			}
 			redraw(font);
 			al_flip_display();
@@ -69,6 +77,9 @@ void StartScreen::run(ALLEGRO_FONT * font) {
 		if (ev.type == ALLEGRO_EVENT_KEY_UP) {
 			if (ev.keyboard.keycode == ALLEGRO_KEY_LCTRL || ev.keyboard.keycode == ALLEGRO_KEY_RCTRL) {
 				ctrl = false; //ctrl is released
+			}
+			if (ev.keyboard.keycode == ALLEGRO_KEY_LSHIFT || ev.keyboard.keycode == ALLEGRO_KEY_RSHIFT) {
+				shift = false;
 			}
 		}
 	}

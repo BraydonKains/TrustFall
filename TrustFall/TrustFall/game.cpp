@@ -2,6 +2,7 @@
 #include "start_screen.h"
 #include "game_screen.h"
 #include "result_screen.h"
+#include "chaos_screen.h"
 
 using std::string;
 using std::map;
@@ -53,6 +54,7 @@ void Game::run() {
 	GameScreen game_screen(sprites, samples);
 	StartScreen start_screen(sprites);
 	ResultScreen result_screen(sprites, 0, 0, Easy);
+	ChaosScreen chaos_screen(sprites, samples);
 	int difficulty = 1; //Difficulty to run
 	bool EXTREME_ON = false; //Flag for EXTREME easter egg
 	while (state != Exit) {
@@ -93,6 +95,10 @@ void Game::run() {
 			game_screen.run(font);
 			state = game_screen.next_state;
 			break;
+		case Chaos:
+			chaos_screen.reset(3, 5, difficulty);
+			chaos_screen.run(font);
+			state = chaos_screen.next_state;
 		case End:
 			//Send proper finishing values for this game to the result screen
 			result_screen.score = game_screen.score;

@@ -57,6 +57,9 @@
     <ClCompile Include="result_screen.cpp">
       <Filter>Source Files\ScreensImplement</Filter>
     </ClCompile>
+    <ClCompile Include="chaos_screen.cpp">
+      <Filter>Source Files\ScreensImplement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cursor.h">
@@ -81,6 +84,9 @@
       <Filter>Header Files\TrustFall</Filter>
     </ClInclude>
     <ClInclude Include="result_screen.h">
+      <Filter>Header Files\Screens</Filter>
+    </ClInclude>
+    <ClInclude Include="chaos_screen.h">
       <Filter>Header Files\Screens</Filter>
     </ClInclude>
   </ItemGroup>

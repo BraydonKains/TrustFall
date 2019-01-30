@@ -10,6 +10,7 @@ enum State {
 	Medium,
 	Hard,
 	EXTREME,
+	Chaos,
 	Help,
 	End,
 	Exit
