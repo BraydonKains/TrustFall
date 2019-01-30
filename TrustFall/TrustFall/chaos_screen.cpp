@@ -21,12 +21,14 @@ using std::ostringstream;
 using std::map;
 using std::pair;
 
+//Separate mutex for the important variables
 pthread_mutex_t go_line_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t game_over_mutex = PTHREAD_MUTEX_INITIALIZER;
-int go_line[3] = { false, false, false };
-bool game_over = false;
+int go_line[3] = { false, false, false }; //Tracking which lines are set to move
+bool game_over = false; //flag for whether thread should exit
 int ticks = 0;
 
+//Thread function
 void* run_line(void *line_arg) {
 	int* line = (int*)line_arg;
 	bool exit_thread = false;
@@ -35,23 +37,23 @@ void* run_line(void *line_arg) {
 		int tenth_secs_wait = rand() % 15 + 1;
 		Sleep(tenth_secs_wait * 100);
 		//Check for gameover
-		while (!pthread_mutex_trylock(&game_over_mutex)) {
+		while (!pthread_mutex_trylock(&game_over_mutex)) { //Wait for game_over mutex
 		}
-		pthread_mutex_lock(&game_over_mutex);
-		if (game_over) {
+		pthread_mutex_lock(&game_over_mutex);//Lock game over mutex while checking
+		if (game_over) { //If the game is over, kill the thread
 			exit_thread = true;
 		}
 		else {
-			while (!pthread_mutex_trylock(&go_line_mutex)) {
+			while (!pthread_mutex_trylock(&go_line_mutex)) { //Wait for go_line mutex
 			}
-			pthread_mutex_lock(&go_line_mutex);
-			go_line[*line] = true;
-			pthread_mutex_unlock(&go_line_mutex);
+			pthread_mutex_lock(&go_line_mutex); //lock go_line while working with it
+			go_line[*line] = true; //set line as ready to go
+			pthread_mutex_unlock(&go_line_mutex); //Free go_line
 		}
-		pthread_mutex_unlock(&game_over_mutex);
+		pthread_mutex_unlock(&game_over_mutex); //Free game_over
 	}
 
-	return 0;
+	return 0; //valid thread exit code
 }
 
 
@@ -121,7 +123,7 @@ void ChaosScreen::run(ALLEGRO_FONT* font) {
 	al_set_sample_instance_playmode(instances["Theme"], ALLEGRO_PLAYMODE_LOOP);
 	play(instances["Theme"]);
 
-	pthread_t line_ts[3];
+	pthread_t line_ts[3]; //Create 3 threads to run the 3 lines
 	for (int i = 0; i < 3; i++) {
 		pthread_create(&line_ts[i], NULL, run_line, (void*)i);
 	}
@@ -136,12 +138,12 @@ void ChaosScreen::run(ALLEGRO_FONT* font) {
 		al_wait_for_event(event_queue, &ev);
 		if (ev.type == ALLEGRO_EVENT_TIMER) {
 			for (unsigned int i = 0; i < 3; i++) {
-				if (go_line[i]) {
-					int add_to = rand() % (lines.size() + 1); //Randomly decide which line to add to, with a 1/lines.size() chance of not adding
-					if (i == add_to) {
+				if (go_line[i]) { //If this line is set to move
+					int add_to = rand() % 2; //randomly 0 or 1
+					if (add_to) { //If we will add to the line this time, add to it
 						lines.at(i).add_employee();
 					}
-					lines.at(i).move(); //Every line will move regardless of any factors
+					lines.at(i).move(); //Move this line
 					if (lines.at(i).fall) { //If an employee has fallen, the game is over
 						map<string, ALLEGRO_SAMPLE_INSTANCE*>::iterator in_it;
 						for (in_it = instances.begin(); in_it != instances.end(); in_it++) {
@@ -246,6 +248,7 @@ void ChaosScreen::run(ALLEGRO_FONT* font) {
 				//Force quit game
 				back();
 				exit_screen = true;
+				game_over = true; //Set flag to ensure the threads exit
 				break;
 			case ALLEGRO_KEY_LCTRL:
 			case ALLEGRO_KEY_RCTRL:
@@ -266,11 +269,13 @@ void ChaosScreen::run(ALLEGRO_FONT* font) {
 	if (next_state != Exit) { //If the game loop was exited naturally rather than forced by Esc
 		cont();
 	}
-
-	//Garbage collection
+ 
+	//Wait while each thread finishes exiting now that the game is over of natural causes
 	for (int i = 0; i < 3; i++) {
 		pthread_join(line_ts[i], NULL);
 	}
+
+	//Garbage collection
 	al_destroy_event_queue(event_queue);
 	al_destroy_timer(timer);
 	map<string, ALLEGRO_SAMPLE_INSTANCE*>::iterator it2;
